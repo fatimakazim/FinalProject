@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- ── Viewport ─────────────────────────────────────────── -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+  <title>Study Until the Ice Melts</title>
+
+  <!-- ── PWA Manifest ─────────────────────────────────────── -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- ── Theme colour (browser chrome / Android task switcher) -->
+  <meta name="theme-color" content="#060e1a" />
+
+  <!-- ── Standard meta ────────────────────────────────────── -->
+  <meta name="description" content="A beautiful focus timer — your session lasts as long as the ice takes to melt." />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- ══════════════════════════════════════════════════════
+       iOS / Safari PWA meta tags
+       These are what make it launch fullscreen from the
+       home screen on iPhone & iPad, hiding the address bar.
+  ══════════════════════════════════════════════════════════ -->
+  <!-- Hides Safari UI chrome when launched from home screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <!-- Sets the status bar style: black-translucent lets content
+       render edge-to-edge behind the notch / Dynamic Island   -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <!-- Name shown below the icon on the home screen -->
+  <meta name="apple-mobile-web-app-title" content="Ice Timer" />
+
+  <!-- ── Apple Touch Icons ────────────────────────────────── -->
+  <!-- iOS uses these — it does NOT read the manifest icons   -->
+  <link rel="apple-touch-icon" href="assets/icons/icon-180.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon-512.png" />
+
+  <!-- ── Apple Splash Screens ─────────────────────────────── -->
+  <!-- Shown while the app loads on iOS home-screen launch.
+       Replace these src paths if you generate real splash PNGs. -->
+  <link rel="apple-touch-startup-image"
+        media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
+        href="assets/splash/splash-390x844.png" />
+  <link rel="apple-touch-startup-image"
+        media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)"
+        href="assets/splash/splash-430x932.png" />
+  <link rel="apple-touch-startup-image"
+        media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+        href="assets/splash/splash-375x812.png" />
+
+  <!-- ── Favicon fallback ─────────────────────────────────── -->
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png" />
+
+  <!-- ── Fonts ────────────────────────────────────────────── -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Montserrat:wght@200;300&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 1: SPLASH / LANDING
+  ══════════════════════════════════════════════════════════ -->
+  <div id="splash" onclick="window.dismissSplash()">
+    <div id="splash-content">
+      <p class="splash-sub">a focus timer</p>
+      <h2 class="splash-title">Study Until<br><em>the Ice Melts</em></h2>
+      <p class="splash-hint">tap to begin</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 2: ONBOARDING (full-page, appears after splash)
+  ══════════════════════════════════════════════════════════ -->
+  <div id="onboarding-screen" class="full-screen hidden">
+    <div class="onboarding-inner">
+
+      <div class="onboarding-header">
+        <p class="ob-kicker">how it works</p>
+        <h2 class="ob-title">Your focus lasts<br><em>as long as the ice</em></h2>
+      </div>
+
+      <div class="ob-steps">
+        <div class="ob-step">
+          <div class="ob-step-icon">＋</div>
+          <div class="ob-step-body">
+            <strong>Add Ice Cubes</strong>
+            <span>Each cube represents ~4 minutes of focus. Add up to 8 for a 32‑minute session.</span>
+          </div>
+        </div>
+        <div class="ob-step">
+          <div class="ob-step-icon">🌡</div>
+          <div class="ob-step-body">
+            <strong>Set the Temperature</strong>
+            <span>Cooler = slower melt = longer session. Hotter = faster melt. You control the pace.</span>
+          </div>
+        </div>
+        <div class="ob-step">
+          <div class="ob-step-icon">⏱</div>
+          <div class="ob-step-body">
+            <strong>Or Use Fixed Timers</strong>
+            <span>Choose Pomodoro (25 min) or Deep Work (60–90 min) — ice is added automatically.</span>
+          </div>
+        </div>
+        <div class="ob-step">
+          <div class="ob-step-icon">🎵</div>
+          <div class="ob-step-body">
+            <strong>Set the Mood</strong>
+            <span>Pick an ambient sound — rain, café, or white noise — to deepen your focus.</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="ob-cta" onclick="window.enterTimer()">
+        <span>I Understand</span>
+        <span class="ob-cta-arrow">→</span>
+      </button>
+
+      <p class="ob-skip" onclick="window.enterTimer()">skip intro</p>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SCREEN 3: MAIN TIMER
+  ══════════════════════════════════════════════════════════ -->
+  <div id="timer-screen" class="hidden">
+
+    <!-- Three.js canvas lives here -->
+    <canvas id="canvas"></canvas>
+
+    <!-- ── TOP BAR ──────────────────────────────────────── -->
+    <div id="ui-top">
+      <p id="subtitle">study until</p>
+      <h1 id="title">the ice melts</h1>
+    </div>
+
+    <!-- ── MODE SELECTOR ────────────────────────────────── -->
+    <div id="mode-bar">
+      <button class="mode-btn active" data-mode="ice"      onclick="window.setMode('ice')">Ice Melt</button>
+      <button class="mode-btn"        data-mode="pomodoro" onclick="window.setMode('pomodoro')">Pomodoro</button>
+      <button class="mode-btn"        data-mode="deepwork" onclick="window.setMode('deepwork')">Deep Work</button>
+    </div>
+
+    <!-- ── BOTTOM PANEL ──────────────────────────────────── -->
+    <div id="ui-bottom">
+
+      <!-- Mode description -->
+      <p id="mode-hint-text" class="mode-hint"></p>
+
+      <!-- Timer display -->
+      <div id="timer-display">
+        <span id="timer">00:00</span>
+        <span id="timer-label">elapsed</span>
+      </div>
+
+      <!-- Ice progress bar (ice mode) -->
+      <div id="ice-status">
+        <div id="ice-bar-container"><div id="ice-bar"></div></div>
+        <span id="ice-count-label">0 cubes remaining</span>
+      </div>
+
+      <!-- Deep Work duration picker -->
+      <div id="deepwork-picker" class="hidden">
+        <button class="dw-btn active" data-mins="60" onclick="window.setDeepWorkDuration(60)">60 min</button>
+        <button class="dw-btn"        data-mins="75" onclick="window.setDeepWorkDuration(75)">75 min</button>
+        <button class="dw-btn"        data-mins="90" onclick="window.setDeepWorkDuration(90)">90 min</button>
+      </div>
+
+      <!-- Temperature slider (ice mode only) -->
+      <div id="temp-control">
+        <div id="temp-row">
+          <span class="temp-label">❄</span>
+          <input type="range" id="temp-slider" min="1" max="5" value="3" step="1"
+                 oninput="window.setTemperature(this.value)" />
+          <span class="temp-label">☀</span>
+        </div>
+        <span id="temp-value-label">Room temp — normal melt (×1.0)</span>
+      </div>
+
+      <!-- Ambient sound selector -->
+      <div id="sound-control">
+        <span class="sound-label">Ambient</span>
+        <div id="sound-buttons">
+          <button class="sound-btn active" data-sound="none"  onclick="window.setSound('none')">✕ None</button>
+          <button class="sound-btn"        data-sound="rain"  onclick="window.setSound('rain')">🌧 Rain</button>
+          <button class="sound-btn"        data-sound="cafe"  onclick="window.setSound('cafe')">☕ Café</button>
+          <button class="sound-btn"        data-sound="white" onclick="window.setSound('white')">〜 White</button>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div id="controls">
+        <button id="btn-add"   class="btn"           onclick="window.addIce()">
+          <span class="btn-icon">+</span>
+          <span class="btn-text">Add Ice</span>
+        </button>
+        <button id="btn-start" class="btn hidden"    onclick="window.startFixedTimer()">
+          <span class="btn-text">Start</span>
+        </button>
+        <button id="btn-reset" class="btn btn-secondary" onclick="window.resetScene()">
+          <span class="btn-text">Reset</span>
+        </button>
+      </div>
+
+      <p id="hint">Add ice cubes to start your session</p>
+
+    </div><!-- /ui-bottom -->
+
+    <!-- ── SESSION SUMMARY MODAL ─────────────────────────── -->
+    <div id="summary-modal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <p class="modal-sub">session complete</p>
+        <h2 class="modal-title" id="summary-title">Well done</h2>
+        <div id="summary-stats">
+          <div class="stat-row">
+            <span class="stat-key">Mode</span>
+            <span class="stat-val" id="sum-mode">—</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-key">Time</span>
+            <span class="stat-val" id="sum-time">—</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-key">Status</span>
+            <span class="stat-val" id="sum-status">—</span>
+          </div>
+        </div>
+        <button class="btn modal-btn" onclick="window.startNewSession()">Start New Session</button>
+      </div>
+    </div>
+
+  </div><!-- /timer-screen -->
+
+  <!-- ══════════════════════════════════════════════════════
+       AUDIO ELEMENTS — all together, inside <body>
+       Ice clink: your local asset
+       Café + White: your local assets (cafe.mp3 / white.mp3)
+       Rain: remote fallback (no local file provided)
+  ══════════════════════════════════════════════════════════ -->
+  <audio id="audio-ice" preload="auto">
+    <source src="assets/ice-clink.wav" type="audio/wav">
+    <source src="assets/ice-clink.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="audio-rain" loop>
+    <source src="https://assets.mixkit.co/active_storage/sfx/2515/2515-preview.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="audio-cafe" loop>
+    <source src="assets/cafe.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="audio-white" loop>
+    <source src="assets/white.mp3" type="audio/mpeg">
+  </audio>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="main.js"></script>
+
+  <!-- ── Service Worker Registration ──────────────────────── -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(function (reg) {
+            console.log('[PWA] Service worker registered, scope:', reg.scope);
+          })
+          .catch(function (err) {
+            console.warn('[PWA] Service worker registration failed:', err);
+          });
+      });
+    }
+  </script>
+</body>
+</html>
