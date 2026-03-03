@@ -7,18 +7,18 @@
 const CACHE_NAME = 'ice-timer-v1';
 
 const PRECACHE_ASSETS = [
-  '/',
-  '/index.html',
-  '/main.js',
-  '/style.css',
-  '/manifest.json',
-  '/assets/ice-clink.wav',
-  '/assets/ice-clink.mp3',
-  '/assets/cafe.mp3',
-  '/assets/white.mp3',
-  '/assets/icons/icon-192.png',
-  '/assets/icons/icon-512.png',
-  '/assets/icons/icon-180.png',
+  '/FinalProject/public/',
+  '/FinalProject/public/index.html',
+  '/FinalProject/public/main.js',
+  '/FinalProject/public/style.css',
+  '/FinalProject/public/manifest.json',
+  '/FinalProject/public/assets/ice-clink.wav',
+  '/FinalProject/public/assets/ice-clink.mp3',
+  '/FinalProject/public/assets/cafe.mp3',
+  '/FinalProject/public/assets/white.mp3',
+  '/FinalProject/public/assets/icons/icon-192.png',
+  '/FinalProject/public/assets/icons/icon-512.png',
+  '/FinalProject/public/assets/icons/icon-180.png',
   'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Montserrat:wght@200;300&display=swap'
 ];
@@ -90,7 +90,7 @@ self.addEventListener('fetch', function (event) {
       }).catch(function () {
         // Offline fallback — return cached index for navigation requests
         if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
+          return caches.match('/FinalProject/public/index.html');
         }
       });
     })
